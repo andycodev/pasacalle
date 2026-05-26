@@ -319,10 +319,10 @@
                     <h3 class="font-black text-slate-900 uppercase text-sm tracking-widest mb-2">Confirmar Llamada</h3>
                     <p class="text-slate-500 text-xs mb-6">
                         ¿Deseas llamar a <span class="font-bold text-slate-800">{{ pasajeroALlamar.nombre_completo
-                            }}</span>?
+                        }}</span>?
                         <br>
                         <span class="text-[14px] font-black text-green-600 block mt-2">{{ pasajeroALlamar.telefono
-                            }}</span>
+                        }}</span>
                     </p>
                     <div class="flex gap-3">
                         <button @click="pasajeroALlamar = null"
@@ -399,11 +399,42 @@
                 </div>
             </div>
         </Transition>
+
+        <!-- Banner de Instalación PWA -->
+        <Transition name="fade">
+            <div v-if="showInstallPrompt"
+                class="fixed bottom-24 left-4 right-4 z-[100] max-w-md mx-auto animate-in slide-in-from-bottom-10 duration-500">
+                <div
+                    class="bg-slate-900 text-white rounded-[2rem] p-4 shadow-2xl border border-white/10 flex items-center gap-4 ring-1 ring-white/20">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-500/20">
+                        <ArrowDownTrayIcon class="w-6 h-6 text-white" />
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-xs font-black uppercase tracking-widest text-orange-500 mb-0.5">App disponible
+                        </h4>
+                        <p class="text-[11px] font-bold text-slate-300 leading-tight">
+                            ¡Instala la App! Ten el control a la mano, más rápido y sin distracciones.
+                        </p>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <button @click="installPWA"
+                            class="bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all active:scale-95">
+                            Instalar
+                        </button>
+                        <button @click="dismissInstall"
+                            class="text-slate-500 hover:text-white px-4 py-1 text-[9px] font-bold uppercase tracking-tighter">
+                            Ahora no
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { createClient } from '@supabase/supabase-js'
 // Importar iconos de Heroicons
 import {
@@ -419,7 +450,8 @@ import {
     XMarkIcon,
     EllipsisVerticalIcon,
     CheckIcon,
-    ArrowPathIcon
+    ArrowPathIcon,
+    ArrowDownTrayIcon
 } from '@heroicons/vue/24/outline'
 
 // Configuración de Supabase
@@ -441,6 +473,8 @@ const pasajeroALlamar = ref(null) // Controla el modal de llamada
 const pasajeroAEliminar = ref(null) // Controla el modal de eliminación
 const activeMenuId = ref(null) // ID del pasajero con menú abierto
 const mostrarModalReinicio = ref(false) // Modal de reinicio general
+const deferredPrompt = ref(null) // Evento de instalación PWA
+const showInstallPrompt = ref(false) // Visibilidad del banner
 const formulario = ref({
     nombre: '',
     telefono: '',
@@ -689,10 +723,43 @@ const ejecutarReinicioGeneral = async () => {
     mostrarModalReinicio.value = false
 }
 
+// Lógica para instalación PWA
+const handleBeforeInstallPrompt = (e) => {
+    // Previene que el navegador muestre el prompt automático
+    e.preventDefault()
+    // Guarda el evento para dispararlo después
+    deferredPrompt.value = e
+    // Muestra nuestro botón personalizado si no se ha rechazado antes
+    if (!localStorage.getItem('pwa_dismissed')) {
+        showInstallPrompt.value = true
+    }
+}
+
+const installPWA = async () => {
+    if (!deferredPrompt.value) return
+    deferredPrompt.value.prompt()
+    const { outcome } = await deferredPrompt.value.userChoice
+    if (outcome === 'accepted') {
+        showInstallPrompt.value = false
+    }
+    deferredPrompt.value = null
+}
+
+const dismissInstall = () => {
+    showInstallPrompt.value = false
+    // Opcional: No molestar por 24 horas o permanentemente
+    localStorage.setItem('pwa_dismissed', 'true')
+}
+
 // Iniciar procesos al montar la aplicación
 onMounted(() => {
     cargarPasajeros()
     activarTiempoReal()
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 })
 
 // Directiva para detectar clics fuera de un elemento (para cerrar el menú)
