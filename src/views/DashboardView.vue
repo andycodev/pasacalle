@@ -455,9 +455,9 @@ import {
 } from '@heroicons/vue/24/outline'
 
 // Configuración de Supabase
-const supabaseUrl = 'https://jyygnbrpckoprmkokdzx.supabase.co'
-const supabaseAnonKey = 'sb_publishable_aam2ExVKQe3INigeLt4cEg_8ue4L6zm'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Importar componentes y funciones de notificación
 import Notification from '@/components/shared/Notification.vue'
