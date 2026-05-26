@@ -1,49 +1,72 @@
 <template>
     <div
-        class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased selection:bg-blue-500 selection:text-white pb-20">
+        class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased selection:bg-orange-500 selection:text-white">
 
-        <!-- Header Fijo con Estilo de App -->
-        <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 py-3 shadow-sm">
-            <div class="flex items-center justify-between max-w-md mx-auto">
-                <h1 class="text-lg font-black tracking-tight text-slate-900 uppercase">
-                    Pasacalle <span class="text-blue-600">Control</span>
-                </h1>
-                <div class="flex gap-2">
-                    <span
-                        class="flex items-center gap-1 text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                        B1: {{ pasajerosBus1.length }}
-                    </span>
-                    <span
-                        class="flex items-center gap-1 text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                        B2: {{ pasajerosBus2.length }}
-                    </span>
+        <!-- Cabecera Fija (Header + Tabs) -->
+        <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+            <header class="px-4 py-3 max-w-md mx-auto">
+                <div class="max-w-md mx-auto">
+                    <h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase text-center">
+                        Control de <span class="text-orange-600">pasajeros</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 text-center font-bold mt-1 leading-tight px-4">
+                        Registro de personas en respaldo al Dr. Roldán Díaz.
+                    </p>
+                    <div class="flex justify-center gap-3 mt-2">
+                        <div
+                            class="flex items-center bg-orange-600 text-white pl-2.5 pr-1 py-1 rounded-full shadow-lg shadow-orange-200">
+                            <TruckIcon class="w-3.5 h-3.5 mr-1.5 opacity-80" />
+                            <span class="text-[10px] font-black uppercase tracking-widest mr-2">Bus 1</span>
+                            <div
+                                class="bg-white text-orange-600 h-6 min-w-[24px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-black">
+                                {{ pasajerosBus1.length }}
+                            </div>
+                        </div>
+                        <div
+                            class="flex items-center bg-amber-500 text-white pl-2.5 pr-1 py-1 rounded-full shadow-lg shadow-amber-200">
+                            <TruckIcon class="w-3.5 h-3.5 mr-1.5 opacity-80" />
+                            <span class="text-[10px] font-black uppercase tracking-widest mr-2">Bus 2</span>
+                            <div
+                                class="bg-white text-amber-500 h-6 min-w-[24px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-black">
+                                {{ pasajerosBus2.length }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- NAVEGACIÓN POR TABS -->
+            <div class="px-4 pb-3 max-w-md mx-auto">
+                <nav class="flex p-1 bg-slate-200/50 rounded-2xl border border-white/50 shadow-inner">
+                    <button @click="tabActiva = 'registro'"
+                        :class="tabActiva === 'registro' ? 'bg-white text-orange-600 shadow-md' : 'text-slate-500'"
+                        class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all duration-200 text-sm">
+                        <UserPlusIcon class="w-4 h-4" /> Registro
+                    </button>
+                    <button @click="tabActiva = 'bus1'"
+                        :class="tabActiva === 'bus1' ? 'bg-white text-orange-600 shadow-md' : 'text-slate-500'"
+                        class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all duration-200 text-sm">
+                        <TruckIcon class="w-4 h-4" /> Bus 1
+                    </button>
+                    <button @click="tabActiva = 'bus2'"
+                        :class="tabActiva === 'bus2' ? 'bg-white text-amber-600 shadow-md' : 'text-slate-500'"
+                        class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all duration-200 text-sm">
+                        <TruckIcon class="w-4 h-4" /> Bus 2
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Buscador Fijo (Solo en Listas) -->
+            <div v-if="tabActiva !== 'registro'" class="px-4 pb-3 max-w-md mx-auto animate-in fade-in duration-300">
+                <div class="relative group">
+                    <MagnifyingGlassIcon class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <input v-model="filtroNombre" type="text" :placeholder="'Buscar en Bus ' + tabActiva.at(-1)"
+                        class="w-full pl-12 pr-4 py-3 rounded-2xl border-none bg-slate-100 outline-none font-bold text-slate-700 focus:ring-2 focus:ring-orange-500/20" />
                 </div>
             </div>
-        </header>
+        </div>
 
-        <main class="mx-auto max-w-md p-4">
-            <!-- NAVEGACIÓN POR TABS (Sticky debajo del header) -->
-            <nav
-                class="flex p-1.5 bg-slate-200/50 rounded-2xl mb-6 sticky top-16 z-20 backdrop-blur-sm border border-white/50 shadow-inner">
-                <button @click="tabActiva = 'registro'"
-                    :class="tabActiva === 'registro' ? 'bg-white text-blue-600 shadow-md scale-100' : 'text-slate-500 scale-95'"
-                    class="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl font-bold transition-all duration-200">
-                    <UserPlusIcon class="w-5 h-5" />
-                    <span class="text-[10px] mt-1 uppercase tracking-tight">Registro</span>
-                </button>
-                <button @click="tabActiva = 'bus1'"
-                    :class="tabActiva === 'bus1' ? 'bg-white text-blue-600 shadow-md scale-100' : 'text-slate-500 scale-95'"
-                    class="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl font-bold transition-all duration-200">
-                    <TruckIcon class="w-5 h-5" />
-                    <span class="text-[10px] mt-1 uppercase tracking-tight">Bus 01</span>
-                </button>
-                <button @click="tabActiva = 'bus2'"
-                    :class="tabActiva === 'bus2' ? 'bg-white text-purple-600 shadow-md scale-100' : 'text-slate-500 scale-95'"
-                    class="flex-1 flex flex-col items-center justify-center py-2.5 rounded-xl font-bold transition-all duration-200">
-                    <TruckIcon class="w-5 h-5" />
-                    <span class="text-[10px] mt-1 uppercase tracking-tight">Bus 02</span>
-                </button>
-            </nav>
+        <main class="mx-auto max-w-md p-4 pb-24">
 
             <!-- CONTENIDO DINÁMICO CON TRANSICIONES -->
             <Transition name="fade" mode="out-in">
@@ -51,7 +74,7 @@
                 <section v-if="tabActiva === 'registro'" key="registro" class="space-y-4">
                     <div class="rounded-3xl bg-white p-6 shadow-xl shadow-slate-200/50 border border-slate-100">
                         <div class="mb-6 flex items-center gap-3">
-                            <div :class="editandoPasajeroId ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'"
+                            <div :class="editandoPasajeroId ? 'bg-amber-100 text-amber-600' : 'bg-orange-100 text-orange-600'"
                                 class="p-3 rounded-2xl">
                                 <UserPlusIcon v-if="!editandoPasajeroId" class="w-6 h-6" />
                                 <PencilSquareIcon v-else class="w-6 h-6" />
@@ -67,48 +90,56 @@
 
                         <form @submit.prevent="guardarPasajero" class="space-y-5">
                             <div class="space-y-1.5">
-                                <label class="text-[11px] font-black uppercase text-slate-400 ml-1">Nombre
+                                <label class="text-xs font-black uppercase text-slate-400 ml-1">Nombre
                                     Completo</label>
-                                <input v-model="formulario.nombre" type="text" required placeholder="Ej. JUAN PEREZ"
-                                    class="w-full rounded-2xl border-slate-200 bg-slate-50 px-5 py-4 text-base font-bold outline-none transition focus:ring-4 focus:ring-blue-500/10 focus:bg-white" />
+                                <input v-model="formulario.nombre" @input="validarNombre" type="text" required
+                                    placeholder="Ej. JUAN PEREZ"
+                                    class="w-full rounded-2xl border-slate-200 bg-slate-50 px-5 py-4 text-base font-bold outline-none transition focus:ring-4 focus:ring-orange-500/10 focus:bg-white uppercase" />
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="space-y-1.5">
-                                    <label class="text-[11px] font-black uppercase text-slate-400 ml-1">Teléfono</label>
-                                    <input v-model="formulario.telefono" type="tel" placeholder="9..."
+                                    <label class="text-xs font-black uppercase text-slate-400 ml-1">Teléfono</label>
+                                    <input v-model="formulario.telefono" @input="validarTelefono" type="tel"
+                                        inputmode="numeric" placeholder="Ej. 987654321"
                                         class="w-full rounded-2xl border-slate-200 bg-slate-50 px-5 py-4 text-base font-bold outline-none transition focus:bg-white" />
                                 </div>
                                 <div class="space-y-1.5">
                                     <label
-                                        class="text-[11px] font-black uppercase text-slate-400 ml-1 text-center block">Unidad</label>
+                                        class="text-xs font-black uppercase text-slate-400 ml-1 text-center block">Unidad</label>
                                     <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl h-[60px]">
                                         <button type="button" @click="formulario.bus_asignado = 1"
-                                            :class="formulario.bus_asignado === 1 ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'"
-                                            class="rounded-xl text-xs font-black transition-all">B1</button>
+                                            :class="formulario.bus_asignado === 1 ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500'"
+                                            class="rounded-xl text-sm font-black transition-all">Bus 1</button>
                                         <button type="button" @click="formulario.bus_asignado = 2"
-                                            :class="formulario.bus_asignado === 2 ? 'bg-white text-purple-600 shadow-sm' : 'text-slate-400'"
-                                            class="rounded-xl text-xs font-black transition-all">B2</button>
+                                            :class="formulario.bus_asignado === 2 ? 'bg-white text-amber-600 shadow-sm' : 'text-slate-500'"
+                                            class="rounded-xl text-sm font-black transition-all">Bus 2</button>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="space-y-1.5">
-                                <label class="text-[11px] font-black uppercase text-slate-400 ml-1">Nota /
-                                    Equipaje</label>
-                                <input v-model="formulario.nota" type="text" placeholder="Ej. 2 maletas grandes"
-                                    class="w-full rounded-2xl border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium outline-none transition focus:bg-white" />
+                                <div class="flex justify-between items-center ml-1">
+                                    <label class="text-xs font-black uppercase text-slate-400">Nota opcional</label>
+                                    <span class="text-xs font-bold"
+                                        :class="(formulario.nota || '').length >= 150 ? 'text-red-500' : 'text-slate-400'">
+                                        {{ (formulario.nota || '').length }}/150
+                                    </span>
+                                </div>
+                                <textarea v-model="formulario.nota" rows="3" maxlength="150"
+                                    placeholder="Ejemplo: Subirá en el camino."
+                                    class="w-full rounded-2xl border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium outline-none transition focus:bg-white resize-none"></textarea>
                             </div>
 
                             <div class="flex flex-col gap-3 pt-4">
                                 <button type="submit" :disabled="guardando || !formulario.nombre.trim()"
-                                    :class="editandoPasajeroId ? 'bg-amber-500 shadow-amber-200' : 'bg-blue-600 shadow-blue-200'"
-                                    class="w-full rounded-2xl py-5 font-black text-white shadow-lg transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
+                                    :class="editandoPasajeroId ? 'bg-amber-500 shadow-amber-200' : 'bg-orange-600 shadow-orange-200'"
+                                    class="w-full rounded-2xl py-5 font-black text-lg text-white shadow-lg transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 uppercase tracking-wide">
                                     <component
                                         :is="guardando ? 'span' : (editandoPasajeroId ? CheckCircleIcon : UserPlusIcon)"
                                         class="w-6 h-6" />
                                     {{ guardando ? 'Guardando...' : (editandoPasajeroId ? 'ACTUALIZAR DATOS' :
-                                    'REGISTRAR AHORA') }}
+                                        'REGISTRAR AHORA') }}
                                 </button>
                                 <button v-if="editandoPasajeroId" type="button" @click="cancelarEdicion"
                                     class="w-full py-4 text-slate-400 font-bold text-sm hover:text-slate-600">
@@ -121,44 +152,42 @@
 
                 <!-- VISTA: LISTADOS (BUS 1 O BUS 2) -->
                 <section v-else key="listas" class="space-y-4">
-                    <!-- Buscador flotante -->
-                    <div class="relative group mx-2">
-                        <MagnifyingGlassIcon class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                        <input v-model="filtroNombre" type="text" :placeholder="'Buscar en Bus 0' + tabActiva.at(-1)"
-                            class="w-full pl-12 pr-4 py-4 rounded-2xl border-none bg-white shadow-lg shadow-slate-200/50 outline-none font-bold text-slate-700" />
-                    </div>
-
                     <!-- Lista Estilo Card -->
                     <div class="space-y-3 px-1">
                         <TransitionGroup name="list">
-                            <div v-for="p in pasajerosFiltrados" :key="p.id"
-                                class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-4 active:scale-[0.98] transition-transform">
-                                <div :class="tabActiva === 'bus1' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'"
-                                    class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 font-black text-xl">
-                                    {{ p.nombre_completo.charAt(0) }}
+                            <div v-for="(p, index) in pasajerosFiltrados" :key="p.id"
+                                class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 active:scale-[0.98] transition-transform">
+                                <div :class="tabActiva === 'bus1' ? 'bg-orange-50 text-orange-600' : 'bg-amber-50 text-amber-600'"
+                                    class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs border border-current/10">
+                                    {{ index + 1 }}
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-bold text-slate-900 truncate text-base leading-tight">{{
-                                        p.nombre_completo }}</h4>
-                                    <div class="flex flex-wrap gap-2 mt-1">
-                                        <span v-if="p.telefono"
-                                            class="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md">
-                                            <PhoneIcon class="w-3 h-3" /> {{ p.telefono }}
-                                        </span>
-                                        <span v-if="p.nota"
-                                            class="flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md truncate max-w-[150px]">
-                                            <DocumentTextIcon class="w-3 h-3" /> {{ p.nota }}
-                                        </span>
-                                    </div>
+                                    <h4
+                                        class="font-bold text-slate-800 text-sm leading-tight break-words tracking-tight uppercase">
+                                        {{ p.nombre_completo }}
+                                    </h4>
+                                    <p v-if="p.telefono"
+                                        class="text-[12px] font-semibold text-slate-500 mt-0.5 flex items-center gap-1">
+                                        <PhoneIcon class="w-3 h-3" /> {{ p.telefono }}
+                                    </p>
                                 </div>
                                 <div class="flex items-center gap-1">
-                                    <button @click="editarPasajero(p)"
-                                        class="p-2.5 text-blue-600 bg-blue-50 rounded-xl">
-                                        <PencilSquareIcon class="w-5 h-5" />
+                                    <button v-if="p.telefono" @click="pasajeroALlamar = p"
+                                        class="p-2 text-green-600 bg-green-50 rounded-lg active:scale-90 transition-transform"
+                                        title="Llamar">
+                                        <PhoneIcon class="w-4 h-4" />
                                     </button>
-                                    <button @click="eliminarPasajero(p.id)"
-                                        class="p-2.5 text-red-500 bg-red-50 rounded-xl">
-                                        <TrashIcon class="w-5 h-5" />
+                                    <button v-if="p.nota" @click="notaEnModal = p"
+                                        class="p-2 text-blue-600 bg-blue-50 rounded-lg active:scale-90 transition-transform"
+                                        title="Ver nota">
+                                        <DocumentTextIcon class="w-4 h-4" />
+                                    </button>
+                                    <button @click="editarPasajero(p)"
+                                        class="p-2 text-orange-600 bg-orange-50 rounded-lg">
+                                        <PencilSquareIcon class="w-4 h-4" />
+                                    </button>
+                                    <button @click="eliminarPasajero(p)" class="p-2 text-red-500 bg-red-50 rounded-lg">
+                                        <TrashIcon class="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
@@ -176,6 +205,98 @@
         <!-- Componente de Notificación Global -->
         <Notification :message="notificationState.message" :type="notificationState.type" :show="notificationState.show"
             @close="hideNotification" />
+
+        <!-- Modal para Ver Nota -->
+        <Transition name="fade">
+            <div v-if="notaEnModal"
+                class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+                @click.self="notaEnModal = null">
+                <div
+                    class="bg-white rounded-3xl p-6 w-full max-w-xs shadow-2xl animate-in zoom-in-95 duration-200 text-center">
+                    <div
+                        class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <DocumentTextIcon class="w-8 h-8" />
+                    </div>
+                    <h3 class="font-black text-slate-900 uppercase text-[10px] tracking-widest mb-1 opacity-50">Nota del
+                        Pasajero</h3>
+                    <p class="text-sm font-bold text-slate-800 mb-4 uppercase leading-tight">
+                        {{ notaEnModal.nombre_completo }}
+                    </p>
+                    <div
+                        class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-slate-700 text-sm leading-relaxed italic whitespace-pre-wrap text-left">
+                        "{{ notaEnModal.nota }}"
+                    </div>
+                    <button @click="notaEnModal = null"
+                        class="w-full mt-6 bg-slate-900 text-white font-bold py-3.5 rounded-2xl active:scale-95 transition-transform text-xs uppercase tracking-widest">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </Transition>
+
+        <!-- Modal Confirmación de Llamada -->
+        <Transition name="fade">
+            <div v-if="pasajeroALlamar"
+                class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+                @click.self="pasajeroALlamar = null">
+                <div
+                    class="bg-white rounded-3xl p-6 w-full max-w-xs shadow-2xl animate-in zoom-in-95 duration-200 text-center">
+                    <div
+                        class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <PhoneIcon class="w-8 h-8" />
+                    </div>
+                    <h3 class="font-black text-slate-900 uppercase text-sm tracking-widest mb-2">Confirmar Llamada</h3>
+                    <p class="text-slate-500 text-xs mb-6">
+                        ¿Deseas llamar a <span class="font-bold text-slate-800">{{ pasajeroALlamar.nombre_completo
+                            }}</span>?
+                        <br>
+                        <span class="text-[14px] font-black text-green-600 block mt-2">{{ pasajeroALlamar.telefono
+                            }}</span>
+                    </p>
+                    <div class="flex gap-3">
+                        <button @click="pasajeroALlamar = null"
+                            class="flex-1 bg-slate-100 text-slate-500 font-bold py-3.5 rounded-2xl active:scale-95 transition-transform text-xs uppercase tracking-widest">
+                            Cancelar
+                        </button>
+                        <a :href="'tel:' + pasajeroALlamar.telefono" @click="pasajeroALlamar = null"
+                            class="flex-1 bg-green-600 text-white font-bold py-3.5 rounded-2xl active:scale-95 transition-transform text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                            Llamar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+
+        <!-- Modal Confirmación de Eliminación -->
+        <Transition name="fade">
+            <div v-if="pasajeroAEliminar"
+                class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+                @click.self="pasajeroAEliminar = null">
+                <div
+                    class="bg-white rounded-3xl p-6 w-full max-w-xs shadow-2xl animate-in zoom-in-95 duration-200 text-center">
+                    <div
+                        class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <TrashIcon class="w-8 h-8" />
+                    </div>
+                    <h3 class="font-black text-slate-900 uppercase text-sm tracking-widest mb-2">Eliminar Registro</h3>
+                    <p class="text-slate-500 text-xs mb-6 px-2">
+                        ¿Estás seguro de eliminar a <span class="font-bold text-slate-800">{{
+                            pasajeroAEliminar.nombre_completo }}</span>?
+                        Esta acción no se puede deshacer.
+                    </p>
+                    <div class="flex gap-3">
+                        <button @click="pasajeroAEliminar = null"
+                            class="flex-1 bg-slate-100 text-slate-500 font-bold py-3.5 rounded-2xl active:scale-95 transition-transform text-xs uppercase tracking-widest">
+                            Volver
+                        </button>
+                        <button @click="confirmarEliminacionDefinitiva"
+                            class="flex-1 bg-red-600 text-white font-bold py-3.5 rounded-2xl active:scale-95 transition-transform text-xs uppercase tracking-widest">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
     </div>
 </template>
 
@@ -192,7 +313,8 @@ import {
     PhoneIcon,
     UserGroupIcon,
     DocumentTextIcon,
-    MagnifyingGlassIcon
+    MagnifyingGlassIcon,
+    XMarkIcon
 } from '@heroicons/vue/24/outline'
 
 // Configuración de Supabase
@@ -209,6 +331,9 @@ const pasajeros = ref([])
 const guardando = ref(false) // Indica si una operación de guardado/actualización está en curso
 const tabActiva = ref('registro') // 'registro', 'bus1', 'bus2'
 const filtroNombre = ref('') // Para el buscador
+const notaEnModal = ref(null) // Controla qué nota se muestra en el modal
+const pasajeroALlamar = ref(null) // Controla el modal de llamada
+const pasajeroAEliminar = ref(null) // Controla el modal de eliminación
 const formulario = ref({
     nombre: '',
     telefono: '',
@@ -284,10 +409,26 @@ const resetFormulario = () => {
     editandoPasajeroId.value = null
 }
 
+// Validadores en tiempo real
+const validarNombre = () => {
+    // Remueve números y convierte a mayúsculas
+    formulario.value.nombre = formulario.value.nombre
+        .replace(/[0-9]/g, '')
+        .toUpperCase()
+}
+
+const validarTelefono = () => {
+    // Remueve todo lo que no sea número
+    formulario.value.telefono = formulario.value.telefono.replace(/\D/g, '')
+}
+
 // Guardar (insertar o actualizar) un pasajero
 const guardarPasajero = async () => {
     if (guardando.value) return
     guardando.value = true
+
+    // Guardar el bus de destino para redireccionar después
+    const busDestino = formulario.value.bus_asignado
 
     // Validar que el nombre no esté vacío
     if (!formulario.value.nombre.trim()) {
@@ -337,6 +478,11 @@ const guardarPasajero = async () => {
     }
 
     showNotification(`Pasajero ${editandoPasajeroId.value ? 'actualizado' : 'registrado'} con éxito.`, 'alert-success')
+
+    // Si estábamos editando, regresamos a la lista del bus correspondiente
+    if (editandoPasajeroId.value) {
+        tabActiva.value = 'bus' + busDestino
+    }
     resetFormulario()
 }
 
@@ -361,12 +507,13 @@ const cancelarEdicion = () => {
     showNotification('Edición cancelada.', 'alert-info')
 }
 
-// Eliminar un pasajero
-const eliminarPasajero = async (id) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar a este pasajero?')) {
-        return
-    }
+// Iniciar flujo de eliminación
+const eliminarPasajero = (pasajero) => {
+    pasajeroAEliminar.value = pasajero
+}
 
+const confirmarEliminacionDefinitiva = async () => {
+    const id = pasajeroAEliminar.value.id
     const { error } = await supabase
         .from('pasajeros')
         .delete()
@@ -377,12 +524,15 @@ const eliminarPasajero = async (id) => {
         return
     }
 
+    pasajeroAEliminar.value = null
     showNotification('Pasajero eliminado con éxito.', 'alert-success')
+
     // Si el pasajero eliminado era el que se estaba editando, cancelar edición
     if (editandoPasajeroId.value === id) {
         cancelarEdicion()
     }
 }
+
 // Iniciar procesos al montar la aplicación
 onMounted(() => {
     cargarPasajeros()
