@@ -3,37 +3,83 @@
         class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased selection:bg-orange-500 selection:text-white">
 
         <!-- Cabecera Fija (Header + Tabs) -->
-        <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm"
+            v-click-outside="() => activeMenuId = null">
             <header class="px-4 py-3 max-w-md mx-auto">
                 <div class="max-w-md mx-auto">
-                    <h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase text-center">
+                    <h1 class="text-xl font-black tracking-tight text-slate-900 uppercase text-center">
                         Control de <span class="text-orange-600">pasajeros</span>
                     </h1>
-                    <p class="text-xs text-slate-500 text-center font-bold mt-1 leading-tight px-4">
+                    <p class="text-sm text-slate-500 text-center font-bold mt-1 leading-tight px-4">
                         Registro de personas en respaldo al Dr. Roldán Díaz.
                     </p>
-                    <div class="flex justify-center gap-3 mt-2">
+
+                    <!-- Resumen Total General -->
+                    <div class="flex flex-col items-center mt-4 gap-4">
                         <div
-                            class="flex items-center bg-orange-600 text-white pl-2.5 pr-1 py-1 rounded-full shadow-lg shadow-orange-200">
-                            <TruckIcon class="w-3.5 h-3.5 mr-1.5 opacity-80" />
-                            <span class="text-[10px] font-black uppercase tracking-widest mr-2">Bus 1</span>
+                            class="flex items-center bg-slate-900 text-white rounded-[2rem] p-1.5 pr-8 shadow-2xl shadow-slate-300 border border-white/10 ring-4 ring-slate-50 transition-transform active:scale-95">
                             <div
-                                class="bg-white text-orange-600 h-6 min-w-[24px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-black">
-                                {{ pasajerosBus1.length }}
+                                class="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 flex items-center justify-center shadow-lg">
+                                <UserGroupIcon class="w-6 h-6 text-white" />
+                            </div>
+                            <div class="ml-4 flex flex-col items-start leading-none">
+                                <span class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 mb-1">Total
+                                    Pasajeros</span>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-2xl font-black text-orange-500 tracking-tighter">{{
+                                        pasajeros.length }}</span>
+                                    <span
+                                        class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Registrados</span>
+                                </div>
                             </div>
                         </div>
-                        <div
-                            class="flex items-center bg-amber-500 text-white pl-2.5 pr-1 py-1 rounded-full shadow-lg shadow-amber-200">
-                            <TruckIcon class="w-3.5 h-3.5 mr-1.5 opacity-80" />
-                            <span class="text-[10px] font-black uppercase tracking-widest mr-2">Bus 2</span>
+
+                        <div class="flex justify-center gap-3">
                             <div
-                                class="bg-white text-amber-500 h-6 min-w-[24px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-black">
-                                {{ pasajerosBus2.length }}
+                                class="flex items-center bg-orange-600 text-white pl-2.5 pr-1 py-1 rounded-full shadow-lg shadow-orange-200">
+                                <TruckIcon class="w-3.5 h-3.5 mr-1.5 opacity-80" />
+                                <span class="text-[10px] font-black uppercase tracking-widest mr-2">Bus 1</span>
+                                <div
+                                    class="bg-white text-orange-600 h-6 min-w-[24px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-black">
+                                    {{ pasajerosBus1.length }}
+                                </div>
+                            </div>
+                            <div
+                                class="flex items-center bg-amber-500 text-white pl-2.5 pr-1 py-1 rounded-full shadow-lg shadow-amber-200">
+                                <TruckIcon class="w-3.5 h-3.5 mr-1.5 opacity-80" />
+                                <span class="text-[10px] font-black uppercase tracking-widest mr-2">Bus 2</span>
+                                <div
+                                    class="bg-white text-amber-500 h-6 min-w-[24px] px-1.5 rounded-full flex items-center justify-center text-[11px] font-black">
+                                    {{ pasajerosBus2.length }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </header>
+
+            <!-- Resumen de Asistencia (Solo en Listas) -->
+            <div v-if="tabActiva !== 'registro'" class="px-4 pb-2 max-w-md mx-auto">
+                <div class="bg-slate-900 rounded-2xl p-3 text-white flex items-center justify-between shadow-lg">
+                    <div class="flex gap-4">
+                        <div class="text-center">
+                            <p class="text-[10px] uppercase font-black text-slate-400">Subieron</p>
+                            <p class="text-lg font-black text-green-400 leading-none">{{ statsAsistencia.asistieron }}
+                            </p>
+                        </div>
+                        <div class="text-center border-l border-slate-700 pl-4">
+                            <p class="text-[10px] uppercase font-black text-slate-400">Faltan</p>
+                            <p class="text-lg font-black text-orange-400 leading-none">{{ statsAsistencia.faltan }}</p>
+                        </div>
+                    </div>
+                    <button @click="confirmarReinicioGeneral"
+                        class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl transition-colors active:scale-95">
+                        <ArrowPathIcon class="w-4 h-4 text-orange-500" />
+                        <span class="text-[10px] font-black uppercase tracking-tight text-slate-300">Reiniciar
+                            Todo</span>
+                    </button>
+                </div>
+            </div>
 
             <!-- NAVEGACIÓN POR TABS -->
             <div class="px-4 pb-3 max-w-md mx-auto">
@@ -156,39 +202,64 @@
                     <div class="space-y-3 px-1">
                         <TransitionGroup name="list">
                             <div v-for="(p, index) in pasajerosFiltrados" :key="p.id"
-                                class="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 active:scale-[0.98] transition-transform">
-                                <div :class="tabActiva === 'bus1' ? 'bg-orange-50 text-orange-600' : 'bg-amber-50 text-amber-600'"
-                                    class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs border border-current/10">
-                                    {{ index + 1 }}
-                                </div>
+                                :class="p.asistio ? 'bg-green-50 border-green-100' : 'bg-white border-slate-100'"
+                                class="p-3 rounded-2xl shadow-sm border flex items-center gap-3 transition-all duration-300">
+
+                                <!-- Botón de Asistencia Rápida -->
+                                <button @click="toggleAsistencia(p)"
+                                    :class="p.asistio ? 'bg-green-600 text-white shadow-green-200 shadow-lg' : 'bg-slate-100 text-slate-400'"
+                                    class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all active:scale-90 font-black">
+                                    <CheckIcon v-if="p.asistio" class="w-6 h-6 stroke-[3]" />
+                                    <span v-else class="text-xs">{{ index + 1 }}</span>
+                                </button>
+
                                 <div class="flex-1 min-w-0">
-                                    <h4
-                                        class="font-bold text-slate-800 text-sm leading-tight break-words tracking-tight uppercase">
+                                    <h4 :class="p.asistio ? 'text-green-900' : 'text-slate-800'"
+                                        class="font-extrabold text-sm leading-tight break-words tracking-tight uppercase">
                                         {{ p.nombre_completo }}
                                     </h4>
                                     <p v-if="p.telefono"
-                                        class="text-[12px] font-semibold text-slate-500 mt-0.5 flex items-center gap-1">
-                                        <PhoneIcon class="w-3 h-3" /> {{ p.telefono }}
+                                        class="text-xs font-bold text-slate-500 mt-1 flex items-center gap-1">
+                                        <PhoneIcon class="w-3.5 h-3.5" /> {{ p.telefono }}
                                     </p>
                                 </div>
-                                <div class="flex items-center gap-1">
-                                    <button v-if="p.telefono" @click="pasajeroALlamar = p"
-                                        class="p-2 text-green-600 bg-green-50 rounded-lg active:scale-90 transition-transform"
-                                        title="Llamar">
-                                        <PhoneIcon class="w-4 h-4" />
+
+                                <!-- Menú de Opciones (Solo los 3 puntos) -->
+                                <div class="relative">
+                                    <button @click.stop="activeMenuId = activeMenuId === p.id ? null : p.id"
+                                        class="p-2 text-slate-400 hover:text-slate-600 active:bg-slate-100 rounded-lg transition-colors">
+                                        <EllipsisVerticalIcon class="w-6 h-6" />
                                     </button>
-                                    <button v-if="p.nota" @click="notaEnModal = p"
-                                        class="p-2 text-blue-600 bg-blue-50 rounded-lg active:scale-90 transition-transform"
-                                        title="Ver nota">
-                                        <DocumentTextIcon class="w-4 h-4" />
-                                    </button>
-                                    <button @click="editarPasajero(p)"
-                                        class="p-2 text-orange-600 bg-orange-50 rounded-lg">
-                                        <PencilSquareIcon class="w-4 h-4" />
-                                    </button>
-                                    <button @click="eliminarPasajero(p)" class="p-2 text-red-500 bg-red-50 rounded-lg">
-                                        <TrashIcon class="w-4 h-4" />
-                                    </button>
+
+                                    <!-- Dropdown Menu -->
+                                    <div v-if="activeMenuId === p.id" :class="[
+                                        'absolute right-0 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 py-2 animate-in fade-in zoom-in-95 duration-200',
+                                        index >= pasajerosFiltrados.length - 2 && pasajerosFiltrados.length > 2 ? 'bottom-full mb-2' : 'top-full mt-2'
+                                    ]">
+                                        <button @click="toggleAsistencia(p); activeMenuId = null"
+                                            class="w-full px-4 py-3 text-left text-xs font-bold flex items-center gap-3 hover:bg-slate-50">
+                                            <CheckCircleIcon :class="p.asistio ? 'text-orange-500' : 'text-green-500'"
+                                                class="w-5 h-5" />
+                                            {{ p.asistio ? 'Anular Asistencia' : 'Subió al Bus' }}
+                                        </button>
+                                        <button v-if="p.telefono" @click="pasajeroALlamar = p; activeMenuId = null"
+                                            class="w-full px-4 py-3 text-left text-xs font-bold flex items-center gap-3 hover:bg-slate-50 text-slate-700">
+                                            <PhoneIcon class="text-green-500 w-5 h-5" /> Llamar
+                                        </button>
+                                        <button v-if="p.nota" @click="notaEnModal = p; activeMenuId = null"
+                                            class="w-full px-4 py-3 text-left text-xs font-bold flex items-center gap-3 hover:bg-slate-50 text-slate-700">
+                                            <DocumentTextIcon class="text-blue-500 w-5 h-5" /> Ver Nota
+                                        </button>
+                                        <button @click="editarPasajero(p); activeMenuId = null"
+                                            class="w-full px-4 py-3 text-left text-xs font-bold flex items-center gap-3 hover:bg-slate-50 text-orange-600">
+                                            <PencilSquareIcon class="w-5 h-5" /> Editar Datos
+                                        </button>
+                                        <div class="border-t border-slate-100 my-1"></div>
+                                        <button @click="eliminarPasajero(p); activeMenuId = null"
+                                            class="w-full px-4 py-3 text-left text-xs font-bold flex items-center gap-3 hover:bg-slate-50 text-red-500">
+                                            <TrashIcon class="w-5 h-5" /> Eliminar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </TransitionGroup>
@@ -217,13 +288,13 @@
                         class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                         <DocumentTextIcon class="w-8 h-8" />
                     </div>
-                    <h3 class="font-black text-slate-900 uppercase text-[10px] tracking-widest mb-1 opacity-50">Nota del
+                    <h3 class="font-black text-slate-900 uppercase text-xs tracking-widest mb-1 opacity-50">Nota del
                         Pasajero</h3>
-                    <p class="text-sm font-bold text-slate-800 mb-4 uppercase leading-tight">
+                    <p class="text-base font-bold text-slate-800 mb-4 uppercase leading-tight">
                         {{ notaEnModal.nombre_completo }}
                     </p>
                     <div
-                        class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-slate-700 text-sm leading-relaxed italic whitespace-pre-wrap text-left">
+                        class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-slate-700 text-base leading-relaxed italic whitespace-pre-wrap text-left">
                         "{{ notaEnModal.nota }}"
                     </div>
                     <button @click="notaEnModal = null"
@@ -297,6 +368,37 @@
                 </div>
             </div>
         </Transition>
+
+        <!-- Modal Confirmación Reinicio General -->
+        <Transition name="fade">
+            <div v-if="mostrarModalReinicio"
+                class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+                @click.self="mostrarModalReinicio = false">
+                <div
+                    class="bg-white rounded-3xl p-6 w-full max-w-xs shadow-2xl animate-in zoom-in-95 duration-200 text-center">
+                    <div
+                        class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ArrowPathIcon class="w-8 h-8" />
+                    </div>
+                    <h3 class="font-black text-slate-900 uppercase text-sm tracking-widest mb-2">Reiniciar Lista</h3>
+                    <p class="text-slate-500 text-xs mb-6 px-2">
+                        Esto marcará a TODOS los pasajeros como <span
+                            class="font-bold text-slate-800 underline uppercase">pendientes</span>. Ideal para iniciar
+                        el viaje de vuelta.
+                    </p>
+                    <div class="flex gap-3">
+                        <button @click="mostrarModalReinicio = false"
+                            class="flex-1 bg-slate-100 text-slate-500 font-bold py-3.5 rounded-2xl text-xs uppercase tracking-widest">
+                            Cancelar
+                        </button>
+                        <button @click="ejecutarReinicioGeneral"
+                            class="flex-1 bg-slate-900 text-white font-bold py-3.5 rounded-2xl text-xs uppercase tracking-widest active:scale-95">
+                            Reiniciar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
     </div>
 </template>
 
@@ -314,7 +416,10 @@ import {
     UserGroupIcon,
     DocumentTextIcon,
     MagnifyingGlassIcon,
-    XMarkIcon
+    XMarkIcon,
+    EllipsisVerticalIcon,
+    CheckIcon,
+    ArrowPathIcon
 } from '@heroicons/vue/24/outline'
 
 // Configuración de Supabase
@@ -334,6 +439,8 @@ const filtroNombre = ref('') // Para el buscador
 const notaEnModal = ref(null) // Controla qué nota se muestra en el modal
 const pasajeroALlamar = ref(null) // Controla el modal de llamada
 const pasajeroAEliminar = ref(null) // Controla el modal de eliminación
+const activeMenuId = ref(null) // ID del pasajero con menú abierto
+const mostrarModalReinicio = ref(false) // Modal de reinicio general
 const formulario = ref({
     nombre: '',
     telefono: '',
@@ -363,6 +470,17 @@ const pasajerosFiltrados = computed(() => {
     return listaBase.filter(p =>
         p.nombre_completo.toLowerCase().includes(query)
     )
+})
+
+// Estadísticas de asistencia basadas en la pestaña activa
+const statsAsistencia = computed(() => {
+    const lista = tabActiva.value === 'bus1' ? pasajerosBus1.value : pasajerosBus2.value
+    const asistieron = lista.filter(p => p.asistio).length
+    return {
+        asistieron,
+        faltan: lista.length - asistieron,
+        total: lista.length
+    }
 })
 
 // Obtener la lista inicial de pasajeros de la base de datos
@@ -446,6 +564,7 @@ const guardarPasajero = async () => {
         nombre_completo: nombreLimpio,
         bus_asignado: formulario.value.bus_asignado,
         telefono: formulario.value.telefono.trim() || null,
+        asistio: false, // Por defecto al registrar
         nota: formulario.value.nota.trim() || null
     }
 
@@ -533,11 +652,63 @@ const confirmarEliminacionDefinitiva = async () => {
     }
 }
 
+// Marcar/Desmarcar asistencia individual
+const toggleAsistencia = async (pasajero) => {
+    const nuevoEstado = !pasajero.asistio
+    const { error } = await supabase
+        .from('pasajeros')
+        .update({ asistio: nuevoEstado })
+        .eq('id', pasajero.id)
+
+    if (error) {
+        showNotification(`Error al actualizar asistencia: ${error.message}`, 'alert-error')
+    } else {
+        const msg = nuevoEstado ? 'Pasajero subió al bus' : 'Asistencia anulada'
+        showNotification(msg, 'alert-info')
+    }
+}
+
+// Lógica de reinicio general por bus
+const confirmarReinicioGeneral = () => {
+    mostrarModalReinicio.value = true
+}
+
+const ejecutarReinicioGeneral = async () => {
+    const busId = tabActiva.value === 'bus1' ? 1 : 2
+
+    const { error } = await supabase
+        .from('pasajeros')
+        .update({ asistio: false })
+        .eq('bus_asignado', busId)
+
+    if (error) {
+        showNotification(`Error al reiniciar lista: ${error.message}`, 'alert-error')
+    } else {
+        showNotification('Lista reiniciada correctamente.', 'alert-success')
+    }
+    mostrarModalReinicio.value = false
+}
+
 // Iniciar procesos al montar la aplicación
 onMounted(() => {
     cargarPasajeros()
     activarTiempoReal()
 })
+
+// Directiva para detectar clics fuera de un elemento (para cerrar el menú)
+const vClickOutside = {
+    mounted(el, binding) {
+        el.clickOutsideEvent = (event) => {
+            if (!(el === event.target || el.contains(event.target))) {
+                binding.value()
+            }
+        }
+        document.body.addEventListener('click', el.clickOutsideEvent)
+    },
+    unmounted(el) {
+        document.body.removeEventListener('click', el.clickOutsideEvent)
+    }
+}
 </script>
 
 <style scoped>
