@@ -14,7 +14,7 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
         name: 'Control de Pasajeros',
-        short_name: 'Pasajeros',
+        short_name: 'CP Control',
         description: 'Sistema de control de pasajeros para buses en tiempo real',
         theme_color: '#000000',
         background_color: '#ffffff',
