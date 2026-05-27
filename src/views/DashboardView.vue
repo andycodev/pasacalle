@@ -361,10 +361,10 @@
                     <h3 class="font-black text-slate-900 uppercase text-sm tracking-widest mb-2">Confirmar Llamada</h3>
                     <p class="text-slate-500 text-xs mb-6">
                         ¿Deseas llamar a <span class="font-bold text-slate-800">{{ pasajeroALlamar.nombre_completo
-                        }}</span>?
+                            }}</span>?
                         <br>
                         <span class="text-[14px] font-black text-green-600 block mt-2">{{ pasajeroALlamar.telefono
-                        }}</span>
+                            }}</span>
                     </p>
                     <div class="flex gap-3">
                         <button @click="pasajeroALlamar = null"
@@ -787,7 +787,7 @@ const compartirWhatsApp = (esResumenGeneral = false) => {
             texto += '\n'
         })
 
-        texto += `\n_Generado por CP Control_`
+        texto += `\n_Huaca Blanca 2026 💚🧡_`
     }
 
     const encodedText = encodeURIComponent(texto)
