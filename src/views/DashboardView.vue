@@ -18,12 +18,6 @@
                     <div class="flex flex-col items-center mt-4 gap-4">
                         <div
                             class="flex items-center bg-slate-900 text-white rounded-[2rem] p-1.5 pr-8 shadow-2xl shadow-slate-300 border border-white/10 ring-4 ring-slate-50 transition-transform active:scale-95">
-                            <!-- Botón de compartir global (Summary) -->
-                            <button @click="compartirWhatsApp(true)"
-                                class="absolute -right-2 -top-2 bg-blue-600 p-2 rounded-full shadow-lg border-2 border-white active:scale-90 transition-transform">
-                                <ShareIcon class="w-4 h-4 text-white" />
-                            </button>
-
                             <div
                                 class="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 flex items-center justify-center shadow-lg">
                                 <UserGroupIcon class="w-6 h-6 text-white" />
@@ -361,10 +355,10 @@
                     <h3 class="font-black text-slate-900 uppercase text-sm tracking-widest mb-2">Confirmar Llamada</h3>
                     <p class="text-slate-500 text-xs mb-6">
                         ¿Deseas llamar a <span class="font-bold text-slate-800">{{ pasajeroALlamar.nombre_completo
-                            }}</span>?
+                        }}</span>?
                         <br>
                         <span class="text-[14px] font-black text-green-600 block mt-2">{{ pasajeroALlamar.telefono
-                            }}</span>
+                        }}</span>
                     </p>
                     <div class="flex gap-3">
                         <button @click="pasajeroALlamar = null"
