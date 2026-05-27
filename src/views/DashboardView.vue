@@ -780,11 +780,11 @@ const compartirWhatsApp = (esResumenGeneral = false) => {
         texto += `--------------------------\n\n`
 
         lista.forEach((p, index) => {
-            const check = p.asistio ? '✅ ' : '❌ '
+            const check = p.asistio ? '✅ ' : '🏷️ '
             texto += `${index + 1}. ${check}${p.nombre_completo}`
-            if (p.telefono) texto += ` (${p.telefono})`
-            if (p.nota) texto += ` - _${p.nota}_`
-            texto += `\n`
+            if (p.telefono) texto += ` (${p.telefono})` + '\n'
+            if (p.nota) texto += ` - _[${p.nota}]_` + '\n'
+            texto += '\n'
         })
 
         texto += `\n_Generado por CP Control_`
