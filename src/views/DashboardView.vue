@@ -10,14 +10,20 @@
                     <h1 class="text-xl font-black tracking-tight text-slate-900 uppercase text-center">
                         Control de <span class="text-orange-600">pasajeros</span>
                     </h1>
-                    <!--    <p class="text-sm text-slate-500 text-center font-bold mt-1 leading-tight px-4">
+                    <p class="text-sm text-slate-500 text-center font-bold mt-1 leading-tight px-4">
                         Registro de personas en respaldo al Dr. Roldán Díaz.
-                    </p> -->
+                    </p>
 
                     <!-- Resumen Total General -->
                     <div class="flex flex-col items-center mt-4 gap-4">
                         <div
                             class="flex items-center bg-slate-900 text-white rounded-[2rem] p-1.5 pr-8 shadow-2xl shadow-slate-300 border border-white/10 ring-4 ring-slate-50 transition-transform active:scale-95">
+                            <!-- Botón de compartir global (Summary) -->
+                            <button @click="compartirWhatsApp(true)"
+                                class="absolute -right-2 -top-2 bg-blue-600 p-2 rounded-full shadow-lg border-2 border-white active:scale-90 transition-transform">
+                                <ShareIcon class="w-4 h-4 text-white" />
+                            </button>
+
                             <div
                                 class="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-600 to-amber-400 flex items-center justify-center shadow-lg">
                                 <UserGroupIcon class="w-6 h-6 text-white" />
@@ -72,12 +78,20 @@
                             <p class="text-lg font-black text-orange-400 leading-none">{{ statsAsistencia.faltan }}</p>
                         </div>
                     </div>
-                    <button @click="confirmarReinicioGeneral"
-                        class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl transition-colors active:scale-95">
-                        <ArrowPathIcon class="w-4 h-4 text-orange-500" />
-                        <span class="text-[10px] font-black uppercase tracking-tight text-slate-300">Reiniciar
-                            Todo</span>
-                    </button>
+                    <div class="flex gap-2">
+                        <button @click="compartirWhatsApp(false)"
+                            class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl transition-colors active:scale-95">
+                            <ShareIcon class="w-4 h-4 text-blue-400" />
+                            <span
+                                class="text-[10px] font-black uppercase tracking-tight text-slate-300">Compartir</span>
+                        </button>
+                        <button @click="confirmarReinicioGeneral"
+                            class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl transition-colors active:scale-95">
+                            <ArrowPathIcon class="w-4 h-4 text-orange-500" />
+                            <span class="text-[10px] font-black uppercase tracking-tight text-slate-300">Reiniciar
+                                Todo</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -347,10 +361,10 @@
                     <h3 class="font-black text-slate-900 uppercase text-sm tracking-widest mb-2">Confirmar Llamada</h3>
                     <p class="text-slate-500 text-xs mb-6">
                         ¿Deseas llamar a <span class="font-bold text-slate-800">{{ pasajeroALlamar.nombre_completo
-                            }}</span>?
+                        }}</span>?
                         <br>
                         <span class="text-[14px] font-black text-green-600 block mt-2">{{ pasajeroALlamar.telefono
-                            }}</span>
+                        }}</span>
                     </p>
                     <div class="flex gap-3">
                         <button @click="pasajeroALlamar = null"
@@ -448,7 +462,8 @@ import {
     EllipsisVerticalIcon,
     CheckIcon,
     ArrowPathIcon,
-    ArrowDownTrayIcon
+    ArrowDownTrayIcon,
+    ShareIcon
 } from '@heroicons/vue/24/outline'
 
 // Configuración de Supabase
@@ -722,9 +737,6 @@ const ejecutarReinicioGeneral = async () => {
 
 // Lógica para instalación PWA
 const handleBeforeInstallPrompt = (e) => {
-    // Si ya está instalado o en modo standalone, no mostrar el banner
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return
-
     // Previene que el navegador muestre el prompt automático
     e.preventDefault()
     // Guarda el evento para dispararlo después
@@ -743,29 +755,54 @@ const installPWA = async () => {
     deferredPrompt.value = null
 }
 
-// Ocultar el banner si la app se acaba de instalar
-const handleAppInstalled = () => {
-    showInstallPrompt.value = false
-    deferredPrompt.value = null
-    console.log('PWA instalada con éxito')
+// Función para compartir lista por WhatsApp
+const compartirWhatsApp = (esResumenGeneral = false) => {
+    let texto = ''
+
+    if (esResumenGeneral) {
+        texto = `*RESUMEN GENERAL - CONTROL DE PASAJEROS*\n`
+        texto += `Total Registrados: ${pasajeros.value.length}\n`
+        texto += `--------------------------\n`
+        texto += `🚌 BUS 1: ${pasajerosBus1.value.length} personas\n`
+        texto += `🚌 BUS 2: ${pasajerosBus2.value.length} personas\n`
+        texto += `\n_Respaldo al Dr. Roldán Díaz_`
+    } else {
+        const busNum = tabActiva.value.at(-1)
+        const lista = tabActiva.value === 'bus1' ? pasajerosBus1.value : pasajerosBus2.value
+
+        if (lista.length === 0) {
+            showNotification('La lista está vacía', 'alert-warning')
+            return
+        }
+
+        texto = `*LISTA DE PASAJEROS - BUS ${busNum}*\n`
+        texto += `Total: ${lista.length} | Subieron: ${statsAsistencia.value.asistieron}\n`
+        texto += `--------------------------\n\n`
+
+        lista.forEach((p, index) => {
+            const check = p.asistio ? '✅ ' : '❌ '
+            texto += `${index + 1}. ${check}${p.nombre_completo}`
+            if (p.telefono) texto += ` (${p.telefono})`
+            if (p.nota) texto += ` - _${p.nota}_`
+            texto += `\n`
+        })
+
+        texto += `\n_Generado por CP Control_`
+    }
+
+    const encodedText = encodeURIComponent(texto)
+    window.open(`https://wa.me/?text=${encodedText}`, '_blank')
 }
 
 // Iniciar procesos al montar la aplicación
 onMounted(() => {
     cargarPasajeros()
     activarTiempoReal()
-
-    // Solo registrar el evento si no estamos ya en modo Standalone
-    if (!(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone)) {
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    }
-
-    window.addEventListener('appinstalled', handleAppInstalled)
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 })
 
 onUnmounted(() => {
     window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.removeEventListener('appinstalled', handleAppInstalled)
 })
 
 // Directiva para detectar clics fuera de un elemento (para cerrar el menú)
